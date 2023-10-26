@@ -1,0 +1,23 @@
+Iniciar cluster swarm: docker swarm init
+
+El resultado de este comando se pone en los nodos workers: docker swarm join --token SWMTKN-1-0vx9q4nl34hw1y3eu43vdcboppopritz4wszzbhce5f5t1a25e-e3tjmd2oniz6ffoai3y21ey6a 192.168.0.101:2377
+
+Ver los nodos: docker node ls
+
+Ver los servicios corriendo: docker service ls
+
+Ver donde están corriendo los servicios corriendo: docker service ls <nombre del servicio>
+
+Eliminar el cluster: docker swarm leave (forzado --force)
+
+Eliminar un servicio: docker service rm <nombre del servicio>
+
+eliminar un nodo: docker service rm <nombre o id del nodo>
+
+Escalar el servicio: docker service <nombre del servicio>=<cantidad de replicas>
+
+Inspeccionar un servicio: docker service inspect <app>_<nombre del servicio>
+
+ver estado de las replicas: docker service ps <app>_<nombre del servicio>
+
+ 

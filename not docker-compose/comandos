@@ -1,0 +1,14 @@
+Crear el nodo manager: docker swarm init
+
+Crear un nodo worker: docker swarm join --token SWMTKN-1-abcdefg... 192.168.0.101:2377 (El comando que da el manager)
+
+Configurar un nodo como manager: docker swarm join-token manager
+
+Crear el servicio con replicas: docker service create --replicas 6 --name nginx-service -p 8080:80 nginx
+
+Creación de replicas (escala): docker service scale <nombre del servicio>=<cant replicas>
+
+Asegurar que solo se use en los nodos worker: docker service create --name <nombre del servicio> --replicas 4 --constraint "node.role==worker" <nombre-de-la-imagen>
+
+
+Especificar la ip al crear el manager: docker swarm init --advertise-addr 192.168.1.100

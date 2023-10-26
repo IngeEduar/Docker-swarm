@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    container_name: api-nginx
+    image: nginx:1.25.2
+    deploy:
+      replicas: 2
+    working_dir: /etc/nginx/conf.d/
+    ports:
+      - 8080:8080
+    volumes:
+      - ./nginx:/etc/nginx/conf.d/
+    networks:
+      - network-test
+
+  api:
+    container_name: api-symfony
+    image: php-symfony
+    deploy:
+      replicas: 2
+    working_dir: /var/www/html
+    ports:
+      - 8000:8000
+    volumes:
+      - ./app/:/var/www/html/
+      - data:/data
+      - /var/www/tmp
+    tmpfs:
+      - /tmp
+    networks:
+      - network-test
+
+  db:
+    container_name: db-mariadb
+    image: mariadb:10.5.8
+    ports:
+      - 3306:3306
+    volumes:
+      - ./database:/var/lib/mysql
+    networks:
+      - network-test
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bdejemplo
+
+volumes:
+  data:
+
+networks:
+  network-test:
+    name: network-test
+#    driver: bridge
+    driver: overlay
+#    driver: host
+#    driver: macvlan
