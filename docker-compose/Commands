@@ -1,23 +1,149 @@
-Iniciar cluster swarm: docker swarm init
+Iniciar cluster swarm: 
+
+	docker swarm init
+
+	opciones:
+
+		--advertise-addr: Especifica la dirección ip que se anunciará para unirse al cluster
+
+		--listen-addr: Especifica la dirección y el puerto ene l que el nodo lider debe escuchar conexiones entrantes.
 
 El resultado de este comando se pone en los nodos workers: docker swarm join --token SWMTKN-1-0vx9q4nl34hw1y3eu43vdcboppopritz4wszzbhce5f5t1a25e-e3tjmd2oniz6ffoai3y21ey6a 192.168.0.101:2377
 
-Ver los nodos: docker node ls
+Ver los servicios corriendo: 
 
-Ver los servicios corriendo: docker service ls
+	docker service ls
 
-Ver donde están corriendo los servicios corriendo: docker service ls <nombre del servicio>
+Ver donde están corriendo los servicios corriendo: 
 
-Eliminar el cluster: docker swarm leave (forzado --force)
+	docker service ls <nombre del servicio>
 
-Eliminar un servicio: docker service rm <nombre del servicio>
+Eliminar el cluster: 
 
-eliminar un nodo: docker service rm <nombre o id del nodo>
+	docker swarm leave (forzado --force)
 
-Escalar el servicio: docker service <nombre del servicio>=<cantidad de replicas>
+Eliminar un servicio: 
 
-Inspeccionar un servicio: docker service inspect <app>_<nombre del servicio>
+	docker service rm <nombre del servicio>
 
-ver estado de las replicas: docker service ps <app>_<nombre del servicio>
+eliminar un nodo: 
 
- 
+	docker node rm <nombre o id del nodo>
+
+Escalar el servicio: 
+
+	docker service scale <nombre del servicio>=<cantidad de replicas>
+
+Inspeccionar un servicio: 
+
+	docker service inspect <app>_<nombre del servicio>
+
+ver estado de las replicas: 
+
+	docker service ps <app>_<nombre del servicio>
+
+Actualizar el servicio sin tiempo de actividad:
+
+Cambiar el docker stack los datos a actualizar y ejecutar: 
+
+	docker service update --image nombre_de_tu_imagen:etiqueta mi_app_mi_servicio
+
+opciones de docker service update:
+
+	--image: actualiza la imagen.
+
+	--args: cambia los argumentos de entrada en el contenedor
+
+	--env-add / --env-rm: Añade o elimina variables de entorno
+
+	--stop-gace-period: Especifica el periodo de gracia para detener contenedores antes de reemplazarlos.
+
+	--update-delay: Controla el retraso durante la actualización del servicio
+
+	--with-registry-auth: Incluye autenticación para un registro de contenedores externos al actualizar la imagen.
+
+	--replicas: actualiza la cantidad de replicas
+
+	--update-parallelism: Controla la cantidad de replicas actualizadas de manera simultanea
+
+o usar:
+
+	docker stack deploy -c docker-compose.yml mi_app
+
+para actualizar desde el docker compose
+
+Ver logs de un servicio:
+
+	docker service logs <nombre del servicio>
+
+obtener info del servicio:
+
+	docker service inspect <nombre del servicio>
+
+	docker service ps (Para ver los servicios)
+
+Actualizar el nodo:
+
+	docker node update (cambia la etiqueta de un nodo) :
+
+		--label-add <etiqueta>=<valor> <nombre del nodo>
+
+		--availability <pause/active> <nombre del nodo>
+
+		--label-rm <etiqueta> <nombre del nodo>
+
+	docker node demote(L -> S)/promote(S -> L) <nombre del nodo>: (cambia un nodo de lider a seguidor)
+
+listar los nodos:
+
+	docker node ls
+
+ Deploy del servicio desde un docker-stack.yml:
+
+ 	docker stack deploy -c docker-compose.yml <nombre del servicio>
+
+ 	opciones:
+
+ 		-c o --compose-file: especifica el archivo
+
+ 		--compose-file-VERSION: permite usar una versión especifica de docker compose.
+
+ 		-c-REPLICAS: especifica el número de replicas para los servicios que se están dsplegando.
+
+Especificar el consumo de recursos en el docker-stak-yml:
+
+	dentro de deploy:
+
+		mode: <replicated (las replicas se manejan solas)>/<global (Un contenedor por nodo)>
+
+		update_config: (Estrategia de actualización de contenedores)
+			parallelism: <cant de contenedores que se actualizan en paralelo>
+			delay: <tiempo de delay en segundos>
+
+		roolback_config: (Estrategia de reversión en caso de que una actualización falle)
+			parallelism: <cant de contenedores que se actualizan en paralelo>
+			failure_ation: continue 
+
+		replicas: <cant de replicas>
+
+		resorces: 
+			limits:
+				cpus: '0.2' (por contenedor)
+				memory: 50M (por contenedor)
+			reservations:
+				cpus: '0.2' (por contenedor)
+				memory: 50M (por contenedor)
+
+		restart_policy: (Politicas de reinicio en caso de fallo)
+			condition: on-failure
+			max.attempts: 3
+			window: 120s
+
+		placements: (Define restriccione de colocación para los contenedores como nodos o etiquetas)
+			constraints:
+	          - node.role == worker
+	          - node.labels.environment == production
+
+	    labels: (Agrega etiquetas al servicio o configuraciones)
+	    	- "con.example.description=My app"
+	    	- "com.example.version=1.0"
